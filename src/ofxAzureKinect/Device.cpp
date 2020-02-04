@@ -230,11 +230,12 @@ namespace ofxAzureKinect
 	{
 		while (this->isThreadRunning())
 		{
-			std::unique_lock<std::mutex> lock(this->mutex);
+			//TODO: verify if necessary
+			//std::unique_lock<std::mutex> lock(this->mutex);
 
 			this->updatePixels();
 			
-			this->condition.wait(lock);
+			//this->condition.wait(lock);
 		}
 	}
 
