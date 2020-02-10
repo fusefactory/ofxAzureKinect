@@ -23,6 +23,9 @@ void KinectStreamTransmitter::threadedFunction() {
 	tcpServer.setup(port, true);
 
 	while (isThreadRunning()) {
+		bitrate = 0;
+		bytePerSecond = 0;
+
 		//tcpServer.waitConnectedClient();
 		// for each connected client lets get the data being sent and lets print it to the screen
 		for (unsigned int i = 0; i < (unsigned int)tcpServer.getLastID(); i++) {
@@ -90,6 +93,7 @@ bool KinectStreamTransmitter::send(bool sendRawBytesToAll) {
 		sendData.data[1] = (sendData.length >> 16) & 0xFF;
 		sendData.data[2] = (sendData.length >> 8) & 0xFF;
 		sendData.data[3] = (sendData.length >> 0) & 0xFF;
+
 		if (sendRawBytesToAll) {
 			result = tcpServer.sendRawBytesToAll(sendData.data, sendData.length + 4);
 		}
@@ -97,7 +101,15 @@ bool KinectStreamTransmitter::send(bool sendRawBytesToAll) {
 			result = tcpServer.sendRawBytes(clientId, sendData.data, sendData.length + 4);
 		}
 
-		//cout << "Sended: " << sendData.length + 4 << " bytes" << endl;
+		bytePerSecond += sendData.length + 4;
+
+		if (ofGetElapsedTimeMillis() - lastTime > 1000) {
+			double diffTime = (ofGetElapsedTimeMillis() - lastTime) / 1000.0;
+			bitrate = (bytePerSecond / diffTime) * 0.0000076294;
+			lastTime = ofGetElapsedTimeMillis();
+
+			bytePerSecond = 0;
+		}
 
 		//free memory
 		delete[] sendData.data;

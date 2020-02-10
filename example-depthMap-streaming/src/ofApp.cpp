@@ -22,10 +22,19 @@ void ofApp::setup(){
 		this->kinectDevice.startCameras();
 	}
 
-	kinectDepthMapTransmitter.setup(&kinectDevice, 4444, 1);
+	kinectDepthMapTransmitter.setup(&kinectDevice, 4444, 2);
 	kinectDepthMapTransmitter.start();
-}
 
+	plot = new ofxHistoryPlot(&kinectDepthMapTransmitter.getBitrate(), "Mbit/s", 5000, true);	//true for autoupdate
+	plot->setAutoRangeShrinksBack(true); //plot scale can shrink back after growing if plot curves requires it
+	plot->setColor(ofColor(255));
+	plot->setShowNumericalInfo(true);
+	plot->setRespectBorders(true);
+	plot->setLineWidth(1);
+	plot->setDrawFromRight(false);
+	plot->setCropToRect(true);
+	plot->update(0);
+}
 
 //--------------------------------------------------------------
 void ofApp::exit(){
@@ -55,6 +64,8 @@ void ofApp::draw(){
 		//this->kinectDevice.getDepthTex().draw(0, 0);
 		t.draw(0, 0);
 	}
+
+	plot->draw(0, 576, 640, 240);
 
 	ofDrawBitmapStringHighlight(ofToString(ofGetFrameRate(), 2) + " FPS", 10, 20);
 }

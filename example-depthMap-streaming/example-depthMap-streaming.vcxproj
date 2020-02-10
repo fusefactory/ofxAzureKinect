@@ -100,9 +100,10 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\..\..\addons\ofxAzureKinect\libs;..\..\..\addons\ofxAzureKinect\libs\turbojpeg;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\include;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib\vs;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib\vs\x64;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib\vs\x64\Debug;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib\vs\x64\Release;..\..\..\addons\ofxAzureKinect\src;..\..\..\addons\ofxAzureKinect\src\ofxAzureKinect;C:\Program Files\Azure Kinect SDK v1.3.0\sdk\include;C:\Program Files\Azure Kinect Body Tracking SDK\sdk\include;..\..\..\addons\ofxNetwork\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\..\..\addons\ofxAzureKinect\libs;..\..\..\addons\ofxAzureKinect\libs\turbojpeg;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\include;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib\vs;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib\vs\x64;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib\vs\x64\Debug;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib\vs\x64\Release;..\..\..\addons\ofxAzureKinect\src;..\..\..\addons\ofxAzureKinect\src\ofxAzureKinect;C:\Program Files\Azure Kinect SDK v1.3.0\sdk\include;C:\Program Files\Azure Kinect Body Tracking SDK\sdk\include;..\..\..\addons\ofxHistoryPlot\src;..\..\..\addons\ofxNetwork\src</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <ObjectFileName>$(IntDir)</ObjectFileName>
+      <PreprocessorDefinitions>USE_OFX_HISTORYPLOT</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -120,10 +121,11 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\..\..\addons\ofxAzureKinect\libs;..\..\..\addons\ofxAzureKinect\libs\turbojpeg;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\include;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib\vs;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib\vs\x64;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib\vs\x64\Debug;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib\vs\x64\Release;..\..\..\addons\ofxAzureKinect\src;..\..\..\addons\ofxAzureKinect\src\ofxAzureKinect;C:\Program Files\Azure Kinect SDK v1.3.0\sdk\include;C:\Program Files\Azure Kinect Body Tracking SDK\sdk\include;..\..\..\addons\ofxNetwork\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\..\..\addons\ofxAzureKinect\libs;..\..\..\addons\ofxAzureKinect\libs\turbojpeg;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\include;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib\vs;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib\vs\x64;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib\vs\x64\Debug;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib\vs\x64\Release;..\..\..\addons\ofxAzureKinect\src;..\..\..\addons\ofxAzureKinect\src\ofxAzureKinect;C:\Program Files\Azure Kinect SDK v1.3.0\sdk\include;C:\Program Files\Azure Kinect Body Tracking SDK\sdk\include;..\..\..\addons\ofxHistoryPlot\src;..\..\..\addons\ofxNetwork\src</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ObjectFileName>$(IntDir)</ObjectFileName>
+      <PreprocessorDefinitions>USE_OFX_HISTORYPLOT</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -140,10 +142,11 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\..\..\addons\ofxAzureKinect\libs;..\..\..\addons\ofxAzureKinect\libs\turbojpeg;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\include;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib\vs;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib\vs\x64;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib\vs\x64\Debug;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib\vs\x64\Release;..\..\..\addons\ofxAzureKinect\src;..\..\..\addons\ofxAzureKinect\src\ofxAzureKinect;C:\Program Files\Azure Kinect SDK v1.3.0\sdk\include;C:\Program Files\Azure Kinect Body Tracking SDK\sdk\include;..\..\..\addons\ofxNetwork\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\..\..\addons\ofxAzureKinect\libs;..\..\..\addons\ofxAzureKinect\libs\turbojpeg;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\include;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib\vs;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib\vs\x64;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib\vs\x64\Debug;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib\vs\x64\Release;..\..\..\addons\ofxAzureKinect\src;..\..\..\addons\ofxAzureKinect\src\ofxAzureKinect;C:\Program Files\Azure Kinect SDK v1.3.0\sdk\include;C:\Program Files\Azure Kinect Body Tracking SDK\sdk\include;..\..\..\addons\ofxHistoryPlot\src;..\..\..\addons\ofxNetwork\src</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ObjectFileName>$(IntDir)</ObjectFileName>
+      <PreprocessorDefinitions>USE_OFX_HISTORYPLOT</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
@@ -163,9 +166,10 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\..\..\addons\ofxAzureKinect\libs;..\..\..\addons\ofxAzureKinect\libs\turbojpeg;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\include;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib\vs;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib\vs\x64;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib\vs\x64\Debug;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib\vs\x64\Release;..\..\..\addons\ofxAzureKinect\src;..\..\..\addons\ofxAzureKinect\src\ofxAzureKinect;C:\Program Files\Azure Kinect SDK v1.3.0\sdk\include;C:\Program Files\Azure Kinect Body Tracking SDK\sdk\include;..\..\..\addons\ofxNetwork\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\..\..\addons\ofxAzureKinect\libs;..\..\..\addons\ofxAzureKinect\libs\turbojpeg;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\include;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib\vs;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib\vs\x64;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib\vs\x64\Debug;..\..\..\addons\ofxAzureKinect\libs\turbojpeg\lib\vs\x64\Release;..\..\..\addons\ofxAzureKinect\src;..\..\..\addons\ofxAzureKinect\src\ofxAzureKinect;C:\Program Files\Azure Kinect SDK v1.3.0\sdk\include;C:\Program Files\Azure Kinect Body Tracking SDK\sdk\include;..\..\..\addons\ofxHistoryPlot\src;..\..\..\addons\ofxNetwork\src</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <ObjectFileName>$(IntDir)</ObjectFileName>
+      <PreprocessorDefinitions>USE_OFX_HISTORYPLOT</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
@@ -185,6 +189,7 @@
     <ClCompile Include="src\KinectDepthMapTransmitter.cpp" />
     <ClCompile Include="src\KinectStreamTransmitter.cpp" />
     <ClCompile Include="..\..\..\addons\ofxAzureKinect\src\ofxAzureKinect\Device.cpp" />
+    <ClCompile Include="..\..\..\addons\ofxHistoryPlot\src\ofxHistoryPlot.cpp" />
     <ClCompile Include="..\..\..\addons\ofxNetwork\src\ofxNetworkUtils.cpp" />
     <ClCompile Include="..\..\..\addons\ofxNetwork\src\ofxTCPClient.cpp" />
     <ClCompile Include="..\..\..\addons\ofxNetwork\src\ofxTCPManager.cpp" />
@@ -201,6 +206,7 @@
     <ClInclude Include="..\..\..\addons\ofxAzureKinect\src\ofxAzureKinect\Types.h" />
     <ClInclude Include="..\..\..\addons\ofxAzureKinect\src\ofxAzureKinect.h" />
     <ClInclude Include="..\..\..\addons\ofxAzureKinect\libs\turbojpeg\include\turbojpeg.h" />
+    <ClInclude Include="..\..\..\addons\ofxHistoryPlot\src\ofxHistoryPlot.h" />
     <ClInclude Include="..\..\..\addons\ofxNetwork\src\ofxNetwork.h" />
     <ClInclude Include="..\..\..\addons\ofxNetwork\src\ofxNetworkUtils.h" />
     <ClInclude Include="..\..\..\addons\ofxNetwork\src\ofxTCPClient.h" />

@@ -1,2 +1,3 @@
 ofxAzureKinect
+ofxHistoryPlot
 ofxNetwork

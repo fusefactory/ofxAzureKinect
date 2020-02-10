@@ -29,7 +29,7 @@ dataLengthStruct KinectDepthMapTransmitter::prepareData() {
 				byteBuffer.data[i * 2 + 1] = (tempTempMap[i] >> 0) & 0xff;
 			}
 			else {
-				cout <<"KinectDephtMapTransmitter::prepareData - Error: value of numBytePerPixel not avaiable."
+				cout << "KinectDephtMapTransmitter::prepareData - Error: value of numBytePerPixel not avaiable.";
 			}
 		}
 

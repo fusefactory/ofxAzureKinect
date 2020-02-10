@@ -20,6 +20,7 @@ class KinectStreamTransmitter : public ofThread {
 public:
 	void setup(ofxAzureKinect::Device* kinectDevice, int port, int numBytePerPixel = 2);
 	void start();
+	float& getBitrate() { return bitrate; }
 
 protected:
 	ofxAzureKinect::Device *kinectDevice;
@@ -35,7 +36,9 @@ private:
 	bool send(bool sendRawBytesToAll=false);			//send function to send data throught tcp/ip
 	//dataLengthStruct compress(char* data, unsigned int length);
 	int compress(char* uncompressedBytes, unsigned int lengthUncompressed, char* compressedByte, int lenghtCompressed);
-
+	long lastTime = 0;
+	float bitrate = 0;	//Mbit
+	long bytePerSecond = 0;
 
 };
 
