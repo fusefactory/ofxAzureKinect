@@ -13,7 +13,7 @@ void ofApp::setup(){
 	kinectSettings.updateColor = false;
 	kinectSettings.updateIr = true;
 	kinectSettings.updateVbo = false;
-	kinectSettings.updateWorld = true;
+	kinectSettings.updateWorld = false;
 	kinectSettings.synchronized = false;
 
 
@@ -37,20 +37,8 @@ void ofApp::update(){
 void ofApp::draw(){
 	ofBackground(128);
 
-	//ofFloatPixels depthMap = this->kinectDevice.getDepthToWorldPix();
-	/*for (int i = 0; i < depthMap.size(); i++) {
-		float a = depthMap[i];
-
-		cout << a << endl;
-	}*/
-
-
-
-	if (this->kinectDevice.isStreaming())
-	{
-		//this->kinectDevice.getColorTex().draw(0, 0, 1280, 720);
+	if (this->kinectDevice.isStreaming()){
 		this->kinectDevice.getDepthTex().draw(0, 0);
-		//this->kinectDevice.getIrTex().draw(1280, 360, 360, 360);
 	}
 
 	ofDrawBitmapStringHighlight(ofToString(ofGetFrameRate(), 2) + " FPS", 10, 20);

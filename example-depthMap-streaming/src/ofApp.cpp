@@ -4,24 +4,25 @@
 void ofApp::setup(){
 	ofSetFrameRate(60);
 
+	ofSetWindowTitle("example-depthMap-streaming");
+
 	auto kinectSettings = ofxAzureKinect::DeviceSettings();
 	kinectSettings.synchronized = false;
 	kinectSettings.updateWorld = false;
 	kinectSettings.depthMode = K4A_DEPTH_MODE_NFOV_UNBINNED;
 	kinectSettings.colorResolution = K4A_COLOR_RESOLUTION_OFF;
 	kinectSettings.cameraFps = K4A_FRAMES_PER_SECOND_30;
-	kinectSettings.updateColor = true;
+	kinectSettings.updateColor = false;
 	kinectSettings.updateIr = true;
 	kinectSettings.updateVbo = false;
 	kinectSettings.updateWorld = false;
 	kinectSettings.synchronized = false;
 
-
 	if (this->kinectDevice.open(kinectSettings)){
 		this->kinectDevice.startCameras();
 	}
 
-	kinectDepthMapTransmitter.setup(&kinectDevice, 4444);
+	kinectDepthMapTransmitter.setup(&kinectDevice, 4444, 1);
 	kinectDepthMapTransmitter.start();
 }
 
@@ -40,37 +41,19 @@ void ofApp::update(){
 void ofApp::draw(){
 	ofBackground(128);
 
-
-	//cout << "------ " << endl;
-	//ofShortPixels depthMap = this->kinectDevice.getDepthPix();
-
-	//for (int x = 300; x < 340; x++) {
-	//	for (int y = 248; y < 288; y++) {
-	//		int index = y * 640 + x;
-	//		if (index < depthMap.size()) {
-	//			//cout << index << endl;
-
-	//			unsigned short a = depthMap[index];
-	//			if (a > 100) printf("a: %hu\n", a);
-	//		}
-	//		
-
-	//	}
-	//}
-
-	//for (int i = 0; i < depthMap.size(); i++) {
-	//	unsigned short a = depthMap[i];
-	//	if(a > 1000) 
-	//		////cout << a << endl;
-	//	printf("a: %hu\n", a);
-
-	//	if (i == 1000) break;
-	//}
-
-
 	if (this->kinectDevice.isStreaming()){
+
+		ofShortPixels depth = kinectDevice.getDepthPix();
+		for (int i = 0; i < depth.size(); i++) {
+			depth[i] = depth[i] * 6.5f;
+		}
+
+		ofTexture t;
+		t.loadData(depth);
+
 		ofSetColor(255, 255);
-		this->kinectDevice.getDepthTex().draw(0, 0);
+		//this->kinectDevice.getDepthTex().draw(0, 0);
+		t.draw(0, 0);
 	}
 
 	ofDrawBitmapStringHighlight(ofToString(ofGetFrameRate(), 2) + " FPS", 10, 20);

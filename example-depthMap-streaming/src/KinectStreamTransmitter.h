@@ -18,12 +18,13 @@ static const int KINECT_HEIGHT = 576;
 class KinectStreamTransmitter : public ofThread {
 
 public:
-	void setup(ofxAzureKinect::Device* kinectDevice, int port);
+	void setup(ofxAzureKinect::Device* kinectDevice, int port, int numBytePerPixel = 2);
 	void start();
 
 protected:
 	ofxAzureKinect::Device *kinectDevice;
 	virtual dataLengthStruct prepareData() = 0;
+	int numBytePerPixel;
 
 private:
 	int clientId;			//current clientID to 

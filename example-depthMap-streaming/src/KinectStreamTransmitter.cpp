@@ -2,9 +2,10 @@
 
 #include <zlib.h>
 
-void KinectStreamTransmitter::setup(ofxAzureKinect::Device* kinectDevice, int port) {
+void KinectStreamTransmitter::setup(ofxAzureKinect::Device* kinectDevice, int port, int numBytePerPixel) {
 	KinectStreamTransmitter::kinectDevice = kinectDevice;
 	KinectStreamTransmitter::port = port;
+	KinectStreamTransmitter::numBytePerPixel = numBytePerPixel;
 
 	KinectStreamTransmitter::running = false;
 }
@@ -81,7 +82,7 @@ bool KinectStreamTransmitter::send(bool sendRawBytesToAll) {
 		sendData.length = originalData.length + 4;
 		sendData.data = new char[sendData.length];
 
-		//compress data and get size of compressed data
+		//compress data and get size of compressed data, compress retrive the size of compressed data
 		sendData.length = compress(originalData.data, originalData.length, &sendData.data[4], sendData.length);
 		
 		//first 4 byte as int to rapresent the message size
@@ -95,6 +96,9 @@ bool KinectStreamTransmitter::send(bool sendRawBytesToAll) {
 		else {
 			result = tcpServer.sendRawBytes(clientId, sendData.data, sendData.length + 4);
 		}
+
+		//cout << "Sended: " << sendData.length + 4 << " bytes" << endl;
+
 		//free memory
 		delete[] sendData.data;
 	}
