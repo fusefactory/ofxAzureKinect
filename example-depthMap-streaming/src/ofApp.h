@@ -4,7 +4,7 @@
 
 #include "ofxAzureKinect.h"
 #include "KinectDepthMapTransmitter.h"
-#include "ofxHistoryPlot.h"
+#include "ofxGui.h"
 
 class ofApp : public ofBaseApp{
 
@@ -31,5 +31,11 @@ private:
 	ofxAzureKinect::Device kinectDevice;
 	KinectDepthMapTransmitter kinectDepthMapTransmitter;
 
-	ofxHistoryPlot* plot;
+	ofTexture depthTexture;
+
+	ofxPanel gui;
+	ofxFloatSlider  leftMarginFloatSlider;
+	ofxFloatSlider  rightMarginFloatSlider;
+	ofxFloatSlider  topMarginFloatSlider;
+	ofxFloatSlider  bottomMarginFloatSlider;
 };

@@ -1,3 +1,3 @@
 ofxAzureKinect
-ofxHistoryPlot
+ofxGui
 ofxNetwork

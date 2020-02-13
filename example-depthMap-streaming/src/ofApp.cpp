@@ -6,6 +6,16 @@ void ofApp::setup(){
 
 	ofSetWindowTitle("example-depthMap-streaming");
 
+	//setup gui
+	gui.setup("kinect", "kinect.xml"); // most of the time you don't need a name
+	gui.add(leftMarginFloatSlider.setup("LEFT MARGIN", 0, 0, 1));
+	gui.add(rightMarginFloatSlider.setup("RIGHT MARGIN", 0, 0, 1));
+	gui.add(topMarginFloatSlider.setup("TOP MARGIN", 0, 0, 1));
+	gui.add(bottomMarginFloatSlider.setup("BOTTOM MARGIN", 0, 0, 1));
+	
+	gui.loadFromFile("kinect.xml");
+
+	//setup kinect
 	auto kinectSettings = ofxAzureKinect::DeviceSettings();
 	kinectSettings.synchronized = false;
 	kinectSettings.updateWorld = false;
@@ -22,18 +32,9 @@ void ofApp::setup(){
 		this->kinectDevice.startCameras();
 	}
 
+	//setup transmitter
 	kinectDepthMapTransmitter.setup(&kinectDevice, 4444, 2);
 	kinectDepthMapTransmitter.start();
-
-	plot = new ofxHistoryPlot(&kinectDepthMapTransmitter.getBitrate(), "Mbit/s", 5000, true);	//true for autoupdate
-	plot->setAutoRangeShrinksBack(true); //plot scale can shrink back after growing if plot curves requires it
-	plot->setColor(ofColor(255));
-	plot->setShowNumericalInfo(true);
-	plot->setRespectBorders(true);
-	plot->setLineWidth(1);
-	plot->setDrawFromRight(false);
-	plot->setCropToRect(true);
-	plot->update(0);
 }
 
 //--------------------------------------------------------------
@@ -43,7 +44,29 @@ void ofApp::exit(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
+	//apply crop
+	if (this->kinectDevice.isStreaming()) {
 
+		ofShortPixels depth = kinectDevice.getDepthPix();
+		const float w = depth.getWidth();
+		const float h = depth.getHeight();
+
+		for (int y = 0; y < depth.getHeight(); y++) {
+			for (int x = 0; x < depth.getWidth(); x++) {
+				int index = depth.getPixelIndex(x, y);
+
+				if (x > leftMarginFloatSlider* w&& x < w - rightMarginFloatSlider * w &&
+					y > topMarginFloatSlider* h&& y < h - bottomMarginFloatSlider * h) {
+					depth[index] = depth[index] * 6.5f;
+				}
+				else {
+					depth[index] = 0;
+				}
+			}
+		}
+
+		depthTexture.loadData(depth);
+	}
 }
 
 //--------------------------------------------------------------
@@ -51,21 +74,10 @@ void ofApp::draw(){
 	ofBackground(128);
 
 	if (this->kinectDevice.isStreaming()){
-
-		ofShortPixels depth = kinectDevice.getDepthPix();
-		for (int i = 0; i < depth.size(); i++) {
-			depth[i] = depth[i] * 6.5f;
-		}
-
-		ofTexture t;
-		t.loadData(depth);
-
-		ofSetColor(255, 255);
-		//this->kinectDevice.getDepthTex().draw(0, 0);
-		t.draw(0, 0);
+		depthTexture.draw(0, 0);
 	}
 
-	plot->draw(0, 576, 640, 240);
+	gui.draw();
 
 	ofDrawBitmapStringHighlight(ofToString(ofGetFrameRate(), 2) + " FPS", 10, 20);
 }
