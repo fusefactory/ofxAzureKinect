@@ -31,8 +31,10 @@ private:
 	ofxAzureKinect::Device kinectDevice;
 	KinectDepthMapTransmitter kinectDepthMapTransmitter;
 
-	ofTexture depthTexture;
-
+	ofShortPixels depthPixels;		//depth image from kinect device
+	ofTexture depthTexture;			//texture to draw depth image
+		
+	//gui
 	ofxPanel gui;
 	ofxFloatSlider  leftMarginFloatSlider;
 	ofxFloatSlider  rightMarginFloatSlider;

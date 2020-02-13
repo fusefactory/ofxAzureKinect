@@ -8,10 +8,10 @@ void ofApp::setup(){
 
 	//setup gui
 	gui.setup("kinect", "kinect.xml"); // most of the time you don't need a name
-	gui.add(leftMarginFloatSlider.setup("LEFT MARGIN", 0, 0, 1));
-	gui.add(rightMarginFloatSlider.setup("RIGHT MARGIN", 0, 0, 1));
-	gui.add(topMarginFloatSlider.setup("TOP MARGIN", 0, 0, 1));
-	gui.add(bottomMarginFloatSlider.setup("BOTTOM MARGIN", 0, 0, 1));
+	gui.add(leftMarginFloatSlider.setup("LEFT MARGIN", 0, 0, 0.5));
+	gui.add(rightMarginFloatSlider.setup("RIGHT MARGIN", 0, 0, 0.5));
+	gui.add(topMarginFloatSlider.setup("TOP MARGIN", 0, 0, 0.5));
+	gui.add(bottomMarginFloatSlider.setup("BOTTOM MARGIN", 0, 0, 0.5));
 	
 	gui.loadFromFile("kinect.xml");
 
@@ -19,7 +19,7 @@ void ofApp::setup(){
 	auto kinectSettings = ofxAzureKinect::DeviceSettings();
 	kinectSettings.synchronized = false;
 	kinectSettings.updateWorld = false;
-	kinectSettings.depthMode = K4A_DEPTH_MODE_NFOV_UNBINNED;
+	kinectSettings.depthMode = K4A_DEPTH_MODE_WFOV_2X2BINNED;
 	kinectSettings.colorResolution = K4A_COLOR_RESOLUTION_OFF;
 	kinectSettings.cameraFps = K4A_FRAMES_PER_SECOND_30;
 	kinectSettings.updateColor = false;
@@ -33,7 +33,7 @@ void ofApp::setup(){
 	}
 
 	//setup transmitter
-	kinectDepthMapTransmitter.setup(&kinectDevice, 4444, 2);
+	kinectDepthMapTransmitter.setup(4444, 2);
 	kinectDepthMapTransmitter.start();
 }
 
@@ -47,26 +47,28 @@ void ofApp::update(){
 	//apply crop
 	if (this->kinectDevice.isStreaming()) {
 
-		ofShortPixels depth = kinectDevice.getDepthPix();
-		const float w = depth.getWidth();
-		const float h = depth.getHeight();
+		depthPixels = kinectDevice.getDepthPix();
+		const float w = depthPixels.getWidth();
+		const float h = depthPixels.getHeight();
 
-		for (int y = 0; y < depth.getHeight(); y++) {
-			for (int x = 0; x < depth.getWidth(); x++) {
-				int index = depth.getPixelIndex(x, y);
+		for (int y = 0; y < depthPixels.getHeight(); y++) {
+			for (int x = 0; x < depthPixels.getWidth(); x++) {
+				int index = depthPixels.getPixelIndex(x, y);
 
 				if (x > leftMarginFloatSlider* w&& x < w - rightMarginFloatSlider * w &&
 					y > topMarginFloatSlider* h&& y < h - bottomMarginFloatSlider * h) {
-					depth[index] = depth[index] * 6.5f;
+					//depthPixels[index] = depthPixels[index] * 6.5f;
 				}
 				else {
-					depth[index] = 0;
+					depthPixels[index] = 0;
 				}
 			}
 		}
 
-		depthTexture.loadData(depth);
+		depthTexture.loadData(depthPixels);
 	}
+
+	kinectDepthMapTransmitter.update(depthPixels);
 }
 
 //--------------------------------------------------------------

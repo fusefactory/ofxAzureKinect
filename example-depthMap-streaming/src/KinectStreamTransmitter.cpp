@@ -2,8 +2,7 @@
 
 #include <zlib.h>
 
-void KinectStreamTransmitter::setup(ofxAzureKinect::Device* kinectDevice, int port, int numBytePerPixel) {
-	KinectStreamTransmitter::kinectDevice = kinectDevice;
+void KinectStreamTransmitter::setup(int port, int numBytePerPixel) {
 	KinectStreamTransmitter::port = port;
 	KinectStreamTransmitter::numBytePerPixel = numBytePerPixel;
 
@@ -72,6 +71,10 @@ void KinectStreamTransmitter::threadedFunction() {
 		}
 		
 	}
+}
+
+void KinectStreamTransmitter::update(ofShortPixels& depthImage) {
+	KinectStreamTransmitter::depthImage = depthImage;
 }
 
 bool KinectStreamTransmitter::send(bool sendRawBytesToAll) {

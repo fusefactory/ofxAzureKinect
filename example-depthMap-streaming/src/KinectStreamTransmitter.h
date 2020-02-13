@@ -1,6 +1,5 @@
 #pragma once
 
-#include "ofxAzureKinect.h"
 #include "ofxNetwork.h"
 #include "ofMain.h"
 
@@ -11,34 +10,32 @@ struct dataLengthStruct {
 	unsigned int length;
 };
 
-static const int KINECT_WIDTH = 640;
-static const int KINECT_HEIGHT = 576;
-
-
 class KinectStreamTransmitter : public ofThread {
 
 public:
-	void setup(ofxAzureKinect::Device* kinectDevice, int port, int numBytePerPixel = 2);
+	void setup(int port, int numBytePerPixel = 2);
 	void start();
-	float& getBitrate() { return bitrate; }
+	void update(ofShortPixels& depthImage);
+
+	float& getBitrate() { return bitrate; }		//return the current bitrate in Mbit/s
 
 protected:
-	ofxAzureKinect::Device *kinectDevice;
 	virtual dataLengthStruct prepareData() = 0;
-	int numBytePerPixel;
+	void threadedFunction();
+	bool send(bool sendRawBytesToAll = false);			//send function to send data throught tcp/ip
+	int compress(char* uncompressedBytes, unsigned int lengthUncompressed, char* compressedByte, int lenghtCompressed);
+
+	int numBytePerPixel;			//number of byte for each pixels used for the transmission
+	ofShortPixels depthImage;		//depth image to sed
 
 private:
+	ofxTCPServer tcpServer;
+
 	int clientId;			//current clientID to 
 	int port;				//port for tpc server
 	bool running;
-	ofxTCPServer tcpServer;
-	void threadedFunction();
-	bool send(bool sendRawBytesToAll=false);			//send function to send data throught tcp/ip
-	//dataLengthStruct compress(char* data, unsigned int length);
-	int compress(char* uncompressedBytes, unsigned int lengthUncompressed, char* compressedByte, int lenghtCompressed);
 	long lastTime = 0;
 	float bitrate = 0;	//Mbit
 	long bytePerSecond = 0;
-
 };
 

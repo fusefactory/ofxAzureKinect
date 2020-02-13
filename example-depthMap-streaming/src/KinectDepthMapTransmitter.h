@@ -5,7 +5,7 @@
 class KinectDepthMapTransmitter : public KinectStreamTransmitter {
 
 public:
-	void setup(ofxAzureKinect::Device* kinectDevice, int port, int numBytePerPixel = 2);
+	void setup(int port, int numBytePerPixel = 2);
 
 protected:
 	dataLengthStruct prepareData() override;
