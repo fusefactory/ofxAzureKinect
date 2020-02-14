@@ -98,6 +98,8 @@ namespace ofxAzureKinect
 
 		const ofVbo& getPointCloudVbo() const;
 
+		ofEvent<void> onNewDepthData;
+
 	public:
 		ofParameter<float> jointSmoothing{ "Joint Smoothing", 0.0f, 0.0f, 1.0f };
 
@@ -181,5 +183,6 @@ namespace ofxAzureKinect
 		ofVbo pointCloudVbo;
 
 		ofEventListeners eventListeners;
+
 	};
 }

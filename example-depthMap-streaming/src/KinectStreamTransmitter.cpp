@@ -48,39 +48,23 @@ void KinectStreamTransmitter::threadedFunction() {
 			//long lastTime;
 
 			while (sent) {
-				lastTime = ofGetElapsedTimeMillis();
-				sent = send();
-				/*long diff = ofGetElapsedTimeMillis() - lastTime;
-				long sleepTime = MAX(0, 16 - diff);
-				if (sleepTime > 0) {
-					ofSleepMillis(sleepTime);
-				}*/
+				if (imageToSend.isAllocated()) {
+					sent = send();
+				}
 
-				//TODO: send only if new image is available
-				ofSleepMillis(30);
-				/*
-				if (input.available() > 0)
-							{
-								BufferedReader br = new BufferedReader(new InputStreamReader(input));
-								String command = br.readLine();
-								if (command.equals(KinectStreamMessages.Restart))
-								{
-									System.out.println("Restart command received!");
-									kinect.restart();
-								}
-							}
-				*/
+				std::unique_lock<std::mutex> lock(mtx);
+				cv.wait(lock);
+
+				//cout << ofGetTimestampString() << endl;
 			}
-
-			//TODO: only first client
-			//break;
 		}
 		
 	}
 }
 
-void KinectStreamTransmitter::update(ofShortPixels& imageToSend) {
+void KinectStreamTransmitter::newData(ofShortPixels& imageToSend) {
 	KinectStreamTransmitter::imageToSend = imageToSend;
+	cv.notify_one();
 }
 
 bool KinectStreamTransmitter::send(bool sendRawBytesToAll) {

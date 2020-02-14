@@ -27,6 +27,8 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 
+		void onNewDepthData() { newDepthData = true; }
+
 private:
 	ofxAzureKinect::Device kinectDevice;
 	KinectDepthMapTransmitter kinectDepthMapTransmitter;
@@ -43,4 +45,6 @@ private:
 	ofxFloatSlider  rightMarginFloatSlider;
 	ofxFloatSlider  topMarginFloatSlider;
 	ofxFloatSlider  bottomMarginFloatSlider;
+
+	bool newDepthData = false;
 };

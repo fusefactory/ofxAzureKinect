@@ -16,7 +16,7 @@ public:
 	void setup(int port, int numBytePerPixel = 2);		//port to open tcp/ip server, numberBytePerPixel used for the transmission
 	void start();										//start thread and open tcp/server
 	void stop();										//stop thread and close tcp/server
-	void update(ofShortPixels& imageToSend);				//update image to send using network
+	void newData(ofShortPixels& imageToSend);				//update image to send using network
 
 	float& getBitrate() { return bitrate; }				//return the current bitrate in Mbit/s
 	int getPort() { return port; }						//return tcp/ip server port
@@ -28,6 +28,9 @@ protected:
 
 	int numBytePerPixel;			//number of byte for each pixels used for the transmission
 	ofShortPixels imageToSend;		//depth image to sed
+
+	std::mutex mtx;
+	std::condition_variable cv;
 
 private:
 	ofxTCPServer tcpServer;

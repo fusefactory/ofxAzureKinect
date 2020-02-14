@@ -192,7 +192,7 @@ namespace ofxAzureKinect
 		}
 
 		this->startThread();
-		ofAddListener(ofEvents().update, this, &Device::update);
+		//ofAddListener(ofEvents().update, this, &Device::update);
 
 		this->bStreaming = true;
 
@@ -233,19 +233,22 @@ namespace ofxAzureKinect
 			//TODO: verify if necessary
 			//std::unique_lock<std::mutex> lock(this->mutex);
 
+			//get_capture is blocking
 			this->updatePixels();
-			
+			ofNotifyEvent(onNewDepthData);
+
 			//this->condition.wait(lock);
 		}
 	}
 
 	void Device::update(ofEventArgs& args)
 	{
-		std::unique_lock<std::mutex> lock(this->mutex);
+		//TODO: verify
+		//std::unique_lock<std::mutex> lock(this->mutex);
 
 		this->updateTextures();
 
-		this->condition.notify_all();
+		//this->condition.notify_all();
 	}
 
 	void Device::updatePixels()

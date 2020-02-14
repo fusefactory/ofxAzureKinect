@@ -39,6 +39,8 @@ void ofApp::setup(){
 		depthMode = K4A_DEPTH_MODE_PASSIVE_IR;
 	}
 
+	ofAddListener(kinectDevice.onNewDepthData, this, &ofApp::onNewDepthData);
+
 	//setup kinect
 	auto kinectSettings = ofxAzureKinect::DeviceSettings();
 	kinectSettings.synchronized = false;
@@ -70,7 +72,9 @@ void ofApp::exit(){
 //--------------------------------------------------------------
 void ofApp::update(){
 	//apply crop
-	if (this->kinectDevice.isStreaming()) {
+	if (this->kinectDevice.isStreaming() && newDepthData) {
+
+		newDepthData = false;
 
 		depthPixels = kinectDevice.getDepthPix();
 		depthToDrawPixels = depthPixels;
@@ -93,10 +97,11 @@ void ofApp::update(){
 			}
 		}
 
+		kinectDepthMapTransmitter.newData(depthPixels);
+
 		depthTexture.loadData(depthToDrawPixels);
 	}
 
-	kinectDepthMapTransmitter.update(depthPixels);
 
 	//hardcore method to fix tcpPortSlider
 	tcpPortSlider = kinectDepthMapTransmitter.getPort();
