@@ -32,10 +32,13 @@ private:
 	KinectDepthMapTransmitter kinectDepthMapTransmitter;
 
 	ofShortPixels depthPixels;		//depth image from kinect device
+	ofShortPixels depthToDrawPixels;
 	ofTexture depthTexture;			//texture to draw depth image
 		
 	//gui
 	ofxPanel gui;
+	ofxIntSlider tcpPortSlider;
+	ofParameter<string> depthModeParamString;
 	ofxFloatSlider  leftMarginFloatSlider;
 	ofxFloatSlider  rightMarginFloatSlider;
 	ofxFloatSlider  topMarginFloatSlider;

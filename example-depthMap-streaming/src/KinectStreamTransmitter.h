@@ -15,9 +15,11 @@ class KinectStreamTransmitter : public ofThread {
 public:
 	void setup(int port, int numBytePerPixel = 2);
 	void start();
+	void stop();
 	void update(ofShortPixels& depthImage);
 
 	float& getBitrate() { return bitrate; }		//return the current bitrate in Mbit/s
+	int getPort() { return port; }
 
 protected:
 	virtual dataLengthStruct prepareData() = 0;

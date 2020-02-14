@@ -7,21 +7,45 @@ void ofApp::setup(){
 	ofSetWindowTitle("example-depthMap-streaming");
 
 	//setup gui
-	gui.setup("kinect", "kinect.xml"); // most of the time you don't need a name
+	gui.setup("kinect", "config.xml"); // most of the time you don't need a name
+	gui.setSize(300, gui.getHeight());
+	gui.add(tcpPortSlider.setup("TCP PORT", 4444, 0, 65535));
+	gui.add(depthModeParamString.set("DEPTH MODE (mouse over)", "K4A_DEPTH_MODE_NFOV_UNBINNED"));
 	gui.add(leftMarginFloatSlider.setup("LEFT MARGIN", 0, 0, 0.5));
 	gui.add(rightMarginFloatSlider.setup("RIGHT MARGIN", 0, 0, 0.5));
 	gui.add(topMarginFloatSlider.setup("TOP MARGIN", 0, 0, 0.5));
 	gui.add(bottomMarginFloatSlider.setup("BOTTOM MARGIN", 0, 0, 0.5));
-	
-	gui.loadFromFile("kinect.xml");
+	gui.loadFromFile("config.xml");
+
+	//retrive kinect configuration
+	k4a_depth_mode_t depthMode = K4A_DEPTH_MODE_NFOV_UNBINNED;
+	k4a_fps_t fps = K4A_FRAMES_PER_SECOND_30;
+
+	string depthModeString = depthModeParamString;
+	if (depthModeString.compare("K4A_DEPTH_MODE_NFOV_2X2BINNED") == 0) {
+		depthMode = K4A_DEPTH_MODE_NFOV_2X2BINNED;
+	}
+	else if (depthModeString.compare("K4A_DEPTH_MODE_NFOV_UNBINNED") == 0) {
+		depthMode = K4A_DEPTH_MODE_NFOV_UNBINNED;
+	}
+	else if (depthModeString.compare("K4A_DEPTH_MODE_WFOV_2X2BINNED") == 0) {
+		depthMode = K4A_DEPTH_MODE_WFOV_2X2BINNED;
+	}
+	else if (depthModeString.compare("K4A_DEPTH_MODE_WFOV_UNBINNED") == 0) {
+		depthMode = K4A_DEPTH_MODE_WFOV_UNBINNED;
+		fps = K4A_FRAMES_PER_SECOND_15; //not support for 30 fps
+	}
+	else if (depthModeString.compare("K4A_DEPTH_MODE_PASSIVE_IR") == 0) {
+		depthMode = K4A_DEPTH_MODE_PASSIVE_IR;
+	}
 
 	//setup kinect
 	auto kinectSettings = ofxAzureKinect::DeviceSettings();
 	kinectSettings.synchronized = false;
 	kinectSettings.updateWorld = false;
-	kinectSettings.depthMode = K4A_DEPTH_MODE_WFOV_2X2BINNED;
+	kinectSettings.depthMode = depthMode;
 	kinectSettings.colorResolution = K4A_COLOR_RESOLUTION_OFF;
-	kinectSettings.cameraFps = K4A_FRAMES_PER_SECOND_30;
+	kinectSettings.cameraFps = fps;
 	kinectSettings.updateColor = false;
 	kinectSettings.updateIr = true;
 	kinectSettings.updateVbo = false;
@@ -33,12 +57,13 @@ void ofApp::setup(){
 	}
 
 	//setup transmitter
-	kinectDepthMapTransmitter.setup(4444, 2);
+	kinectDepthMapTransmitter.setup(tcpPortSlider, 2);
 	kinectDepthMapTransmitter.start();
 }
 
 //--------------------------------------------------------------
 void ofApp::exit(){
+	kinectDepthMapTransmitter.stop();
 	this->kinectDevice.close();
 }
 
@@ -48,6 +73,8 @@ void ofApp::update(){
 	if (this->kinectDevice.isStreaming()) {
 
 		depthPixels = kinectDevice.getDepthPix();
+		depthToDrawPixels = depthPixels;
+
 		const float w = depthPixels.getWidth();
 		const float h = depthPixels.getHeight();
 
@@ -58,17 +85,22 @@ void ofApp::update(){
 				if (x > leftMarginFloatSlider* w&& x < w - rightMarginFloatSlider * w &&
 					y > topMarginFloatSlider* h&& y < h - bottomMarginFloatSlider * h) {
 					//depthPixels[index] = depthPixels[index] * 6.5f;
+					depthToDrawPixels[index] = depthToDrawPixels[index] * 9.0f;
 				}
 				else {
 					depthPixels[index] = 0;
+					depthToDrawPixels[index] = 0;
 				}
 			}
 		}
 
-		depthTexture.loadData(depthPixels);
+		depthTexture.loadData(depthToDrawPixels);
 	}
 
 	kinectDepthMapTransmitter.update(depthPixels);
+
+	//hardcore method to fix tcpPortSlider
+	tcpPortSlider = kinectDepthMapTransmitter.getPort();
 }
 
 //--------------------------------------------------------------
@@ -76,7 +108,8 @@ void ofApp::draw(){
 	ofBackground(128);
 
 	if (this->kinectDevice.isStreaming()){
-		depthTexture.draw(0, 0);
+		if(depthTexture.isAllocated())
+			depthTexture.draw(0, 0);
 	}
 
 	gui.draw();

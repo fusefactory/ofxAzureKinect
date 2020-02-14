@@ -15,6 +15,11 @@ void KinectStreamTransmitter::start() {
 	startThread();
 }
 
+void KinectStreamTransmitter::stop() {
+	stopThread();
+	tcpServer.close();
+}
+
 void KinectStreamTransmitter::threadedFunction() {
 	//TODO: retrive current local ip
 	cout << ofGetTimestampString() + " -KinectStreamTransmitter: starting ip: TODO port: " << port << endl;
