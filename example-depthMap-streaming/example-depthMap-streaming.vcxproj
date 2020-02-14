@@ -180,6 +180,7 @@
     <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Compressor.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\ofApp.cpp" />
     <ClCompile Include="src\KinectDepthMapTransmitter.cpp" />
@@ -202,6 +203,7 @@
     <ClCompile Include="..\..\..\addons\ofxNetwork\src\ofxUDPManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Compressor.h" />
     <ClInclude Include="src\ofApp.h" />
     <ClInclude Include="src\KinectDepthMapTransmitter.h" />
     <ClInclude Include="src\KinectStreamTransmitter.h" />

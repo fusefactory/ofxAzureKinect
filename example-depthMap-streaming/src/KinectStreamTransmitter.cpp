@@ -1,6 +1,5 @@
 #include "KinectStreamTransmitter.h"
-
-#include <zlib.h>
+#include "Compressor.h"
 
 void KinectStreamTransmitter::setup(int port, int numBytePerPixel) {
 	KinectStreamTransmitter::port = port;
@@ -46,7 +45,7 @@ void KinectStreamTransmitter::threadedFunction() {
 			cout <<ofGetTimestampString() + " - KinectStreamTransmitter: transmitting to " + ip + " on port: " + port << endl;
 
 			bool sent = true;
-			long lastTime;
+			//long lastTime;
 
 			while (sent) {
 				lastTime = ofGetElapsedTimeMillis();
@@ -56,6 +55,8 @@ void KinectStreamTransmitter::threadedFunction() {
 				if (sleepTime > 0) {
 					ofSleepMillis(sleepTime);
 				}*/
+
+				//TODO: send only if new image is available
 				ofSleepMillis(30);
 				/*
 				if (input.available() > 0)
@@ -78,8 +79,8 @@ void KinectStreamTransmitter::threadedFunction() {
 	}
 }
 
-void KinectStreamTransmitter::update(ofShortPixels& depthImage) {
-	KinectStreamTransmitter::depthImage = depthImage;
+void KinectStreamTransmitter::update(ofShortPixels& imageToSend) {
+	KinectStreamTransmitter::imageToSend = imageToSend;
 }
 
 bool KinectStreamTransmitter::send(bool sendRawBytesToAll) {
@@ -94,7 +95,7 @@ bool KinectStreamTransmitter::send(bool sendRawBytesToAll) {
 		sendData.data = new char[sendData.length];
 
 		//compress data and get size of compressed data, compress retrive the size of compressed data
-		sendData.length = compress(originalData.data, originalData.length, &sendData.data[4], sendData.length);
+		sendData.length = Compressor::compress(originalData.data, originalData.length, &sendData.data[4], sendData.length);
 		
 		//first 4 byte as int to rapresent the message size
 		sendData.data[0] = (sendData.length >> 24) & 0xFF;
@@ -124,35 +125,4 @@ bool KinectStreamTransmitter::send(bool sendRawBytesToAll) {
 	}
 	
 	return result;
-}
-
-int KinectStreamTransmitter::compress(char* uncompressedBytes, unsigned int lengthUncompressed, char* compressedByte, int lenghtCompressed) {
-	if (uncompressedBytes == NULL) return -1;	//TODO: return NULL?
-
-	z_stream defstream;
-	defstream.zalloc = Z_NULL;
-	defstream.zfree = Z_NULL;
-	defstream.opaque = Z_NULL;
-	defstream.avail_in = lengthUncompressed; // size of input
-	defstream.avail_out = lenghtCompressed;
-	defstream.next_in = (Bytef*) (uncompressedBytes);
-	defstream.next_out = (Bytef*)compressedByte; // output char arra
-
-	//source https://gist.github.com/arq5x/5315739#file-zlib-example-cpp-L35
-	// the actual compression work.
-	if (deflateInit(&defstream, Z_BEST_SPEED) != Z_OK) {
-		cout << "deflateInit(&defstream, Z_BEST_SPEED) != Z_OK" << endl;
-		free(uncompressedBytes);
-		return -1;
-	}
-
-	int deflateResult = deflate(&defstream, Z_FINISH);
-	deflateEnd(&defstream);
-
-	if (deflateResult != Z_STREAM_END) {
-		std::cout << "couldn't finish deflation" << std::endl;
-		return -1;
-	}
-
-	return defstream.total_out;
 }

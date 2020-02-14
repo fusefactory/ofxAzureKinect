@@ -13,22 +13,21 @@ struct dataLengthStruct {
 class KinectStreamTransmitter : public ofThread {
 
 public:
-	void setup(int port, int numBytePerPixel = 2);
-	void start();
-	void stop();
-	void update(ofShortPixels& depthImage);
+	void setup(int port, int numBytePerPixel = 2);		//port to open tcp/ip server, numberBytePerPixel used for the transmission
+	void start();										//start thread and open tcp/server
+	void stop();										//stop thread and close tcp/server
+	void update(ofShortPixels& imageToSend);				//update image to send using network
 
-	float& getBitrate() { return bitrate; }		//return the current bitrate in Mbit/s
-	int getPort() { return port; }
+	float& getBitrate() { return bitrate; }				//return the current bitrate in Mbit/s
+	int getPort() { return port; }						//return tcp/ip server port
 
 protected:
-	virtual dataLengthStruct prepareData() = 0;
+	virtual dataLengthStruct prepareData() = 0;			//override to prepare data
 	void threadedFunction();
 	bool send(bool sendRawBytesToAll = false);			//send function to send data throught tcp/ip
-	int compress(char* uncompressedBytes, unsigned int lengthUncompressed, char* compressedByte, int lenghtCompressed);
 
 	int numBytePerPixel;			//number of byte for each pixels used for the transmission
-	ofShortPixels depthImage;		//depth image to sed
+	ofShortPixels imageToSend;		//depth image to sed
 
 private:
 	ofxTCPServer tcpServer;
@@ -36,8 +35,10 @@ private:
 	int clientId;			//current clientID to 
 	int port;				//port for tpc server
 	bool running;
-	long lastTime = 0;
-	float bitrate = 0;	//Mbit
+	
+	//bitrate calculations
+	long lastTime = 0;		//last time of calc bitrate
+	float bitrate = 0;		//Mbit
 	long bytePerSecond = 0;
 };
 

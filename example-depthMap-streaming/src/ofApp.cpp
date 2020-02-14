@@ -84,7 +84,6 @@ void ofApp::update(){
 
 				if (x > leftMarginFloatSlider* w&& x < w - rightMarginFloatSlider * w &&
 					y > topMarginFloatSlider* h&& y < h - bottomMarginFloatSlider * h) {
-					//depthPixels[index] = depthPixels[index] * 6.5f;
 					depthToDrawPixels[index] = depthToDrawPixels[index] * 9.0f;
 				}
 				else {
