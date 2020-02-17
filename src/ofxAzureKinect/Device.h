@@ -97,9 +97,12 @@ namespace ofxAzureKinect
 		const std::vector<uint32_t>& getBodyIDs() const;
 
 		const ofVbo& getPointCloudVbo() const;
+		ofEvent<void> onNewDepthData;
+
 
 	public:
 		ofParameter<float> jointSmoothing{ "Joint Smoothing", 0.0f, 0.0f, 1.0f };
+		void setUpdateTextures(bool updateTextures) { this->bUpdateTextures = updateTextures; }
 
 	protected:
 		void threadedFunction() override;
@@ -129,6 +132,7 @@ namespace ofxAzureKinect
 		bool bUpdateBodies;
 		bool bUpdateWorld;
 		bool bUpdateVbo;
+		bool bUpdateTextures;
 
 		std::condition_variable condition;
 		uint64_t pixFrameNum;
