@@ -194,6 +194,8 @@ namespace ofxAzureKinect
 		this->startThread();
 		ofAddListener(ofEvents().update, this, &Device::update);
 
+		if(this->bUpdateTextures) ofAddListener(ofEvents().update, this, &Device::update);
+
 		this->bStreaming = true;
 
 		return true;
@@ -230,11 +232,16 @@ namespace ofxAzureKinect
 	{
 		while (this->isThreadRunning())
 		{
-			std::unique_lock<std::mutex> lock(this->mutex);
+			//std::unique_lock<std::mutex> lock(this->mutex);
 
+			//update pixels wait until new data
 			this->updatePixels();
+
+			//notify new data available
+			ofNotifyEvent(onNewDepthData);
+
 			
-			this->condition.wait(lock);
+			//this->condition.wait(lock);
 		}
 	}
 
