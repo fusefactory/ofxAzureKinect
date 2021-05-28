@@ -1,7 +1,6 @@
 #pragma once
 
 #include <k4a/k4a.hpp>
-#include <k4abt.h>
 #include <turbojpeg.h>
 
 #include "ofBufferObject.h"
@@ -36,17 +35,6 @@ namespace ofxAzureKinect
 		DeviceSettings(int idx = 0);
 	};
 
-	struct BodyTrackingSettings
-	{
-		SensorOrientation sensorOrientation;
-		ProcessingMode processingMode;
-		int32_t gpuDeviceID;
-
-		bool updateBodies;
-
-		BodyTrackingSettings();
-	};
-
 	class Device 
 		: ofThread
 	{
@@ -59,7 +47,6 @@ namespace ofxAzureKinect
 
 		bool open(int idx = 0);
 		bool open(DeviceSettings settings);
-		bool open(DeviceSettings settings, BodyTrackingSettings bodyTrackingSettings);
 		bool close();
 
 		bool startCameras();
@@ -88,13 +75,6 @@ namespace ofxAzureKinect
 
 		const ofPixels& getColorInDepthPix() const;
 		const ofTexture& getColorInDepthTex() const;
-
-		const ofPixels& getBodyIndexPix() const;
-		const ofTexture& getBodyIndexTex() const;
-
-		size_t getNumBodies() const;
-		const std::vector<k4abt_skeleton_t>& getBodySkeletons() const;
-		const std::vector<uint32_t>& getBodyIDs() const;
 
 		const ofVbo& getPointCloudVbo() const;
 		ofEvent<void> onNewDepthData;
@@ -127,9 +107,7 @@ namespace ofxAzureKinect
 		bool bOpen;
 		bool bStreaming;
 
-		bool bUpdateColor;
 		bool bUpdateIr;
-		bool bUpdateBodies;
 		bool bUpdateWorld;
 		bool bUpdateVbo;
 		bool bUpdateTextures;
@@ -145,9 +123,6 @@ namespace ofxAzureKinect
 		k4a::transformation transformation;
 		k4a::device device;
 		k4a::capture capture;
-
-		k4abt_tracker_configuration_t trackerConfig;
-		k4abt_tracker_t bodyTracker;
 
 		tjhandle jpegDecompressor;
 
@@ -173,11 +148,6 @@ namespace ofxAzureKinect
 
 		ofPixels colorInDepthPix;
 		ofTexture colorInDepthTex;
-
-		ofPixels bodyIndexPix;
-		ofTexture bodyIndexTex;
-		std::vector<k4abt_skeleton_t> bodySkeletons;
-		std::vector<uint32_t> bodyIDs;
 
 		std::vector<glm::vec3> positionCache;
 		std::vector<glm::vec2> uvCache;

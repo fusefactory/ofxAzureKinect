@@ -19,49 +19,37 @@ namespace ofxAzureKinect
 		, synchronized(true)
 	{}
 
-	BodyTrackingSettings::BodyTrackingSettings()
-		: sensorOrientation(K4ABT_SENSOR_ORIENTATION_DEFAULT)
-		, processingMode(K4ABT_TRACKER_PROCESSING_MODE_GPU)
-		, gpuDeviceID(0)
-		, updateBodies(false)
-	{}
 
 	int Device::getInstalledCount()
 	{
 		return k4a_device_get_installed_count();
 	}
 
+
 	Device::Device()
 		: index(-1)
 		, bOpen(false)
 		, bStreaming(false)
-		, bUpdateColor(false)
+		// , bUpdateColor(false)
 		, bUpdateIr(false)
-		, bUpdateBodies(false)
 		, bUpdateWorld(false)
 		, bUpdateVbo(false)
-		, bodyTracker(nullptr)
-		, jpegDecompressor(tjInitDecompress())
+		// , jpegDecompressor(tjInitDecompress())
 	{}
 
 	Device::~Device()
 	{
-		this->close();
+		//this->close();
 
-		tjDestroy(jpegDecompressor);
+		//tjDestroy(jpegDecompressor);
 	}
 
 	bool Device::open(int idx)
 	{
-		return this->open(DeviceSettings(idx), BodyTrackingSettings());
+		return this->open(DeviceSettings(idx));
 	}
 
 	bool Device::open(DeviceSettings deviceSettings)
-	{
-		return this->open(deviceSettings, BodyTrackingSettings());
-	}
-
-	bool Device::open(DeviceSettings deviceSettings, BodyTrackingSettings bodyTrackingSettings)
 	{
 		this->config = K4A_DEVICE_CONFIG_INIT_DISABLE_ALL;
 		this->config.depth_mode = deviceSettings.depthMode;
@@ -70,8 +58,6 @@ namespace ofxAzureKinect
 		this->config.camera_fps = deviceSettings.cameraFps;
 		this->config.synchronized_images_only = deviceSettings.synchronized;
 
-		this->trackerConfig.sensor_orientation = bodyTrackingSettings.sensorOrientation;
-		this->trackerConfig.gpu_device_id = bodyTrackingSettings.gpuDeviceID;
 
 		if (this->bOpen)
 		{
@@ -101,19 +87,10 @@ namespace ofxAzureKinect
 		this->index = deviceSettings.deviceIndex;
 		this->bOpen = true;
 
-		this->bUpdateColor = deviceSettings.updateColor;
+		// this->bUpdateColor = deviceSettings.updateColor;
 		this->bUpdateIr = deviceSettings.updateIr;
 		this->bUpdateWorld = deviceSettings.updateWorld;
 		this->bUpdateVbo = deviceSettings.updateWorld && deviceSettings.updateVbo;
-
-		this->bUpdateBodies = bodyTrackingSettings.updateBodies;
-		if (this->bUpdateBodies)
-		{
-			this->eventListeners.push(this->jointSmoothing.newListener([this](float &)
-			{
-				k4abt_tracker_set_temporal_smoothing(this->bodyTracker, this->jointSmoothing);
-			}));
-		}
 
 		ofLogNotice(__FUNCTION__) << "Successfully opened device " << this->index << " with serial number " << this->serialNumber << ".";
 
@@ -156,28 +133,22 @@ namespace ofxAzureKinect
 			return false;
 		}
 
-		if (this->bUpdateColor)
-		{
-			// Create transformation.
-			this->transformation = k4a::transformation(this->calibration);
-		}
-
-		if (this->bUpdateBodies)
-		{
-			// Create tracker.
-			k4abt_tracker_create(&this->calibration, this->trackerConfig, &this->bodyTracker);
-		}
+		// if (this->bUpdateColor)
+		// {
+		// 	// Create transformation.
+		// 	this->transformation = k4a::transformation(this->calibration);
+		// }
 
 		if (this->bUpdateWorld)
 		{
 			// Load depth to world LUT.
 			this->setupDepthToWorldTable();
 
-			if (this->bUpdateColor)
-			{
-				// Load color to world LUT.
-				this->setupColorToWorldTable();
-			}
+			// if (this->bUpdateColor)
+			// {
+			// 	// Load color to world LUT.
+			// 	this->setupColorToWorldTable();
+			// }
 		}
 
 		// Start cameras.
@@ -213,13 +184,6 @@ namespace ofxAzureKinect
 
 		this->depthToWorldImg.reset();
 		this->transformation.destroy();
-
-		if (this->bUpdateBodies)
-		{
-			k4abt_tracker_shutdown(this->bodyTracker);
-			k4abt_tracker_destroy(this->bodyTracker);
-			this->bodyTracker = nullptr;
-		}
 
 		this->device.stop_cameras();
 
@@ -291,44 +255,7 @@ namespace ofxAzureKinect
 			ofLogWarning(__FUNCTION__) << "No Depth16 capture found!";
 		}
 
-		k4a::image colorImg;
-		if (this->bUpdateColor)
-		{
-			// Probe for a color image.
-			colorImg = this->capture.get_color_image();
-			if (colorImg)
-			{
-				const auto colorDims = glm::ivec2(colorImg.get_width_pixels(), colorImg.get_height_pixels());
-				if (!colorPix.isAllocated())
-				{
-					this->colorPix.allocate(colorDims.x, colorDims.y, OF_PIXELS_BGRA);
-				}
-
-				if (this->config.color_format == K4A_IMAGE_FORMAT_COLOR_MJPG)
-				{
-					const int decompressStatus = tjDecompress2(this->jpegDecompressor,
-						colorImg.get_buffer(),
-						static_cast<unsigned long>(colorImg.get_size()),
-						this->colorPix.getData(),
-						colorDims.x,
-						0, // pitch
-						colorDims.y,
-						TJPF_BGRA,
-						TJFLAG_FASTDCT | TJFLAG_FASTUPSAMPLE);
-				}
-				else
-				{
-					const auto colorData = reinterpret_cast<uint8_t*>(colorImg.get_buffer());
-					this->colorPix.setFromPixels(colorData, colorDims.x, colorDims.y, 4);
-				}
-
-				ofLogVerbose(__FUNCTION__) << "Capture Color " << colorDims.x << "x" << colorDims.y << " stride: " << colorImg.get_stride_bytes() << ".";
-			}
-			else
-			{
-				ofLogWarning(__FUNCTION__) << "No Color capture found!";
-			}
-		}
+		// }
 
 		k4a::image irImg;
 		if (this->bUpdateIr)
@@ -354,75 +281,28 @@ namespace ofxAzureKinect
 			}
 		}
 
-		if (this->bUpdateBodies)
-		{
-			k4a_wait_result_t enqueueResult = k4abt_tracker_enqueue_capture(this->bodyTracker, this->capture.handle(), K4A_WAIT_INFINITE);
-			if (enqueueResult == K4A_WAIT_RESULT_FAILED)
-			{
-				ofLogError(__FUNCTION__) << "Failed adding capture to tracker process queue!";
-			}
-			else
-			{
-				k4abt_frame_t bodyFrame = nullptr;
-				k4a_wait_result_t popResult = k4abt_tracker_pop_result(this->bodyTracker, &bodyFrame, K4A_WAIT_INFINITE);
-				if (popResult == K4A_WAIT_RESULT_SUCCEEDED)
-				{
-					// Probe for a body index map image.
-					k4a::image bodyIndexImg = k4abt_frame_get_body_index_map(bodyFrame);
-					const auto bodyIndexSize = glm::ivec2(bodyIndexImg.get_width_pixels(), bodyIndexImg.get_height_pixels());
-					if (!this->bodyIndexPix.isAllocated())
-					{
-						this->bodyIndexPix.allocate(bodyIndexSize.x, bodyIndexSize.y, 1);
-					}
+		// if (this->bUpdateVbo)
+		// {
+		// 	if (this->bUpdateColor)
+		// 	{
+		// 		this->updatePointsCache(colorImg, this->colorToWorldImg);
+		// 	}
+		// 	else
+		// 	{
+		// 		this->updatePointsCache(depthImg, this->depthToWorldImg);
+		// 	}
+		// }
 
-					const auto bodyIndexData = reinterpret_cast<uint8_t*>(bodyIndexImg.get_buffer());
-					this->bodyIndexPix.setFromPixels(bodyIndexData, bodyIndexSize.x, bodyIndexSize.y, 1);
-
-					ofLogVerbose(__FUNCTION__) << "Capture BodyIndex " << bodyIndexSize.x << "x" << bodyIndexSize.y << " stride: " << bodyIndexImg.get_stride_bytes() << ".";
-					bodyIndexImg.reset();
-
-					size_t numBodies = k4abt_frame_get_num_bodies(bodyFrame);
-					ofLogVerbose(__FUNCTION__) << numBodies << " bodies found!";
-
-					this->bodySkeletons.resize(numBodies);
-					this->bodyIDs.resize(numBodies);
-					for (size_t i = 0; i < numBodies; i++)
-					{
-						k4abt_skeleton_t skeleton;
-						k4abt_frame_get_body_skeleton(bodyFrame, i, &skeleton);
-						this->bodySkeletons[i] = skeleton;
-						uint32_t id = k4abt_frame_get_body_id(bodyFrame, i);
-						this->bodyIDs[i] = id;
-					}
-
-					// Release body frame once we're finished.
-					k4abt_frame_release(bodyFrame);
-				}
-			}
-		}
-
-		if (this->bUpdateVbo)
-		{
-			if (this->bUpdateColor)
-			{
-				this->updatePointsCache(colorImg, this->colorToWorldImg);
-			}
-			else
-			{
-				this->updatePointsCache(depthImg, this->depthToWorldImg);
-			}
-		}
-
-		if (colorImg && this->bUpdateColor && this->config.color_format == K4A_IMAGE_FORMAT_COLOR_BGRA32)
-		{
-			// TODO: Fix this for non-BGRA formats, maybe always keep a BGRA k4a::image around.
-			this->updateDepthInColorFrame(depthImg, colorImg);
-			this->updateColorInDepthFrame(depthImg, colorImg);
-		}
+		// if (colorImg && this->bUpdateColor && this->config.color_format == K4A_IMAGE_FORMAT_COLOR_BGRA32)
+		// {
+		// 	// TODO: Fix this for non-BGRA formats, maybe always keep a BGRA k4a::image around.
+		// 	this->updateDepthInColorFrame(depthImg, colorImg);
+		// 	this->updateColorInDepthFrame(depthImg, colorImg);
+		// }
 
 		// Release images.
 		depthImg.reset();
-		colorImg.reset();
+		// colorImg.reset();
 		irImg.reset();
 
 		// Release capture.
@@ -446,29 +326,29 @@ namespace ofxAzureKinect
 			this->depthTex.loadData(this->depthPix);
 			ofLogVerbose(__FUNCTION__) << "Update Depth16 " << this->depthTex.getWidth() << "x" << this->depthTex.getHeight() << ".";
 
-			if (this->bUpdateColor)
-			{
-				// Update the color texture.
-				if (!this->colorTex.isAllocated())
-				{
-					this->colorTex.allocate(this->colorPix);
-					this->colorTex.setTextureMinMagFilter(GL_NEAREST, GL_NEAREST);
+			// if (this->bUpdateColor)
+			// {
+			// 	// Update the color texture.
+			// 	if (!this->colorTex.isAllocated())
+			// 	{
+			// 		this->colorTex.allocate(this->colorPix);
+			// 		this->colorTex.setTextureMinMagFilter(GL_NEAREST, GL_NEAREST);
 
-					if (this->config.color_format == K4A_IMAGE_FORMAT_COLOR_BGRA32)
-					{
-						this->colorTex.bind();
-						{
-							glTexParameteri(this->colorTex.texData.textureTarget, GL_TEXTURE_SWIZZLE_R, GL_BLUE);
-							glTexParameteri(this->colorTex.texData.textureTarget, GL_TEXTURE_SWIZZLE_B, GL_RED);
-						}
-						this->colorTex.unbind();
-					}
-				}
+			// 		if (this->config.color_format == K4A_IMAGE_FORMAT_COLOR_BGRA32)
+			// 		{
+			// 			this->colorTex.bind();
+			// 			{
+			// 				glTexParameteri(this->colorTex.texData.textureTarget, GL_TEXTURE_SWIZZLE_R, GL_BLUE);
+			// 				glTexParameteri(this->colorTex.texData.textureTarget, GL_TEXTURE_SWIZZLE_B, GL_RED);
+			// 			}
+			// 			this->colorTex.unbind();
+			// 		}
+			// 	}
 
-				this->colorTex.loadData(this->colorPix);
+			// 	this->colorTex.loadData(this->colorPix);
 
-				ofLogVerbose(__FUNCTION__) << "Update Color " << this->colorTex.getWidth() << "x" << this->colorTex.getHeight() << ".";
-			}
+			// 	ofLogVerbose(__FUNCTION__) << "Update Color " << this->colorTex.getWidth() << "x" << this->colorTex.getHeight() << ".";
+			// }
 
 			if (this->bUpdateIr)
 			{
@@ -485,47 +365,36 @@ namespace ofxAzureKinect
 				ofLogVerbose(__FUNCTION__) << "Update Ir16 " << this->irTex.getWidth() << "x" << this->irTex.getHeight() << ".";
 			}
 
-			if (this->bUpdateBodies)
-			{
-				if (!this->bodyIndexTex.isAllocated())
-				{
-					this->bodyIndexTex.allocate(this->bodyIndexPix);
-					this->bodyIndexTex.setTextureMinMagFilter(GL_NEAREST, GL_NEAREST);
-				}
-
-				this->bodyIndexTex.loadData(this->bodyIndexPix);
-			}
-
 			if (this->bUpdateVbo)
 			{
 				this->pointCloudVbo.setVertexData(this->positionCache.data(), this->numPoints, GL_STREAM_DRAW);
 				this->pointCloudVbo.setTexCoordData(this->uvCache.data(), this->numPoints, GL_STREAM_DRAW);
 			}
 
-			if (this->bUpdateColor && this->config.color_format == K4A_IMAGE_FORMAT_COLOR_BGRA32)
-			{
-				if (this->depthInColorPix.isAllocated() && !this->depthInColorTex.isAllocated())
-				{
-					this->depthInColorTex.allocate(this->depthInColorPix);
-					this->depthInColorTex.setTextureMinMagFilter(GL_NEAREST, GL_NEAREST);
-				}
+			// if (this->bUpdateColor && this->config.color_format == K4A_IMAGE_FORMAT_COLOR_BGRA32)
+			// {
+			// 	if (this->depthInColorPix.isAllocated() && !this->depthInColorTex.isAllocated())
+			// 	{
+			// 		this->depthInColorTex.allocate(this->depthInColorPix);
+			// 		this->depthInColorTex.setTextureMinMagFilter(GL_NEAREST, GL_NEAREST);
+			// 	}
 
-				this->depthInColorTex.loadData(this->depthInColorPix);
+			// 	this->depthInColorTex.loadData(this->depthInColorPix);
 			
-				if (this->colorInDepthPix.isAllocated() && !this->colorInDepthTex.isAllocated())
-				{
-					this->colorInDepthTex.allocate(this->colorInDepthPix);
-					this->colorInDepthTex.setTextureMinMagFilter(GL_NEAREST, GL_NEAREST);
-					this->colorInDepthTex.bind();
-					{
-						glTexParameteri(this->colorInDepthTex.texData.textureTarget, GL_TEXTURE_SWIZZLE_R, GL_BLUE);
-						glTexParameteri(this->colorInDepthTex.texData.textureTarget, GL_TEXTURE_SWIZZLE_B, GL_RED);
-					}
-					this->colorInDepthTex.unbind();
-				}
+			// 	if (this->colorInDepthPix.isAllocated() && !this->colorInDepthTex.isAllocated())
+			// 	{
+			// 		this->colorInDepthTex.allocate(this->colorInDepthPix);
+			// 		this->colorInDepthTex.setTextureMinMagFilter(GL_NEAREST, GL_NEAREST);
+			// 		this->colorInDepthTex.bind();
+			// 		{
+			// 			glTexParameteri(this->colorInDepthTex.texData.textureTarget, GL_TEXTURE_SWIZZLE_R, GL_BLUE);
+			// 			glTexParameteri(this->colorInDepthTex.texData.textureTarget, GL_TEXTURE_SWIZZLE_B, GL_RED);
+			// 		}
+			// 		this->colorInDepthTex.unbind();
+			// 	}
 
-				this->colorInDepthTex.loadData(this->colorInDepthPix);
-			}
+			// 	this->colorInDepthTex.loadData(this->colorInDepthPix);
+			// }
 
 			// Update frame number.
 			this->texFrameNum = this->pixFrameNum;
@@ -827,31 +696,6 @@ namespace ofxAzureKinect
 	const ofTexture& Device::getColorInDepthTex() const
 	{
 		return this->colorInDepthTex;
-	}
-
-	const ofPixels& Device::getBodyIndexPix() const
-	{
-		return this->bodyIndexPix;
-	}
-
-	const ofTexture& Device::getBodyIndexTex() const
-	{
-		return this->bodyIndexTex;
-	}
-
-	size_t Device::getNumBodies() const
-	{
-		return this->bodySkeletons.size();
-	}
-
-	const std::vector<k4abt_skeleton_t>& Device::getBodySkeletons() const
-	{
-		return this->bodySkeletons;
-	}
-
-	const std::vector<uint32_t>& Device::getBodyIDs() const
-	{
-		return this->bodyIDs;
 	}
 
 	const ofVbo& Device::getPointCloudVbo() const
